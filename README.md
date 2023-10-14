@@ -21,7 +21,7 @@ Para usar o MySQL:
 `docker-compose up`
 
 #### Acessos:
-URL base: http://localhost:4444
-Documentação Swagger: http://localhost:4444/swagger
-Banco de dados MongoDB: mongodb://orion_root:j5m966qp7jiypfda@localhost:27017
-Banco de dados MySQL: mysql://orion_root:j5m966qp7jiypfda@localhost:3306
+- URL base: http://localhost:4444
+- Documentação Swagger: http://localhost:4444/swagger
+- Banco de dados MongoDB: mongodb://orion_root:j5m966qp7jiypfda@localhost:27017
+- Banco de dados MySQL: mysql://orion_root:j5m966qp7jiypfda@localhost:3306
