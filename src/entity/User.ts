@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  BeforeInsert,
+  BeforeUpdate,
+  ManyToMany
+} from 'typeorm';
+
+import { Role } from './Role';
 
 @Entity('users')
 export class User {
@@ -15,8 +24,22 @@ export class User {
   password: string;
 
   @Column()
-  createdAt: string;
+  createdAt: Date;
+
+  @BeforeInsert()
+  public setCreatedAt(): void {
+    this.createdAt = new Date();
+  }
 
   @Column()
-  updateAt: string;
+  updateAt: Date;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  public setUpdateAt(): void {
+    this.updateAt = new Date();
+  }
+
+  @ManyToMany(() => Role, (role) => role.users)
+  roles: Role[];
 }

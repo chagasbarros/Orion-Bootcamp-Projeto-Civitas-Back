@@ -3,9 +3,17 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToMany,
-  JoinTable
+  JoinTable,
+  BeforeInsert,
+  BeforeUpdate
 } from 'typeorm';
 import { User } from './User';
+
+export enum enumRoles {
+  ADMIN = 'ADMIN',
+  TEACHER = 'TEACHER',
+  TUTOR = 'TUTOR'
+}
 
 @Entity('roles')
 export class Role {
@@ -19,12 +27,23 @@ export class Role {
   description: string;
 
   @Column()
-  createdAt: string;
+  createdAt: Date;
+
+  @BeforeInsert()
+  public setCreatedAt(): void {
+    this.createdAt = new Date();
+  }
 
   @Column()
-  updatedAt: string;
+  updatedAt: Date;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  public setUpdateAt(): void {
+    this.updatedAt = new Date();
+  }
 
   @ManyToMany(() => User)
-  @JoinTable()
+  @JoinTable({ name: 'roles_users' })
   users: User[];
 }
