@@ -8,20 +8,20 @@ import {
   BeforeUpdate
 } from 'typeorm';
 import { User } from './User';
-
-export enum enumRoles {
-  ADMIN = 'ADMIN',
-  TEACHER = 'TEACHER',
-  TUTOR = 'TUTOR'
-}
+import { enumRoles } from '../models/enums/roleEnum';
 
 @Entity('roles')
 export class Role {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  name: string;
+  @Column({
+    name: 'autenticacao',
+    type: 'enum',
+    enum: enumRoles,
+    default: enumRoles.TUTOR
+  })
+  public authType: string;
 
   @Column()
   description: string;
@@ -29,21 +29,22 @@ export class Role {
   @Column()
   createdAt: Date;
 
+  @Column()
+  updatedAt: Date;
+
+  @ManyToMany(() => User)
+  @JoinTable({ name: 'roles_users' })
+  users: User[];
+
+  // Methods
   @BeforeInsert()
   public setCreatedAt(): void {
     this.createdAt = new Date();
   }
-
-  @Column()
-  updatedAt: Date;
 
   @BeforeInsert()
   @BeforeUpdate()
   public setUpdateAt(): void {
     this.updatedAt = new Date();
   }
-
-  @ManyToMany(() => User)
-  @JoinTable({ name: 'roles_users' })
-  users: User[];
 }
