@@ -15,7 +15,6 @@ Código base para o desenvolvimento do backend dos projeto Civitas
 
 - O projeto está pré configurado para utilizar MySQL.
 
-
 ### Rodando o projeto
 
 `docker-compose up`
