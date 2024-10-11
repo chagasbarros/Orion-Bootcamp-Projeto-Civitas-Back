@@ -36,5 +36,7 @@
     "swagger-jsdoc": "6.2.8",
     "swagger-ui-express": "5.0.0",
     "typeorm": "0.3.17"
-  }
+  },
+  "main": ".eslintrc.js",
+  "keywords": []
 }
