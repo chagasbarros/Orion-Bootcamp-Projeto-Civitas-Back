@@ -8,7 +8,7 @@ import {
   BeforeUpdate
 } from 'typeorm';
 import { User } from './User';
-import { enumRoles } from '../models/enums/roleEnum';
+import { enumRoles } from '../models/enums/EnumRoles';
 
 @Entity('roles')
 export class Role {
@@ -18,8 +18,7 @@ export class Role {
   @Column({
     name: 'autenticacao',
     type: 'enum',
-    enum: enumRoles,
-    default: enumRoles.TUTOR
+    enum: enumRoles
   })
   public authType: string;
 
