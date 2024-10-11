@@ -5,6 +5,9 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import { MysqlDataSource } from './config/database';
 import { swaggerConfig } from './config/swagger';
 import routes from './routes';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 MysqlDataSource.initialize()
   .then(() => {

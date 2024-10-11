@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
+import { BadRequestError, NotFoundError, ok } from '../helpers/apiReturns';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { BadRequestError, NotFoundError, ok } from '../helpers/apiReturns';
 
-const users = [{ username: 'Rizon', password: 'Riz0n!' }];
-const JWT_SECRET = 'Rizon-bootcamp';
+const users = [];
 
 export class LoginController {
   /**
@@ -87,9 +86,13 @@ export class LoginController {
     if (!validPassword)
       return new BadRequestError(response, 'Dados Incorretos');
 
-    const token = jwt.sign({ username: existingUser.username }, JWT_SECRET, {
-      expiresIn: '4h'
-    });
+    const token = jwt.sign(
+      { username: existingUser.username },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '4h'
+      }
+    );
 
     return new ok(response, token);
   }
