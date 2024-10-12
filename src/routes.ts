@@ -1,11 +1,17 @@
 import { Router } from 'express';
 import { HomeController } from './controller/HomeController';
-import { LoginController } from './controller/LoginController';
+import { AuthController } from './controller/AuthController';
 
 const router = Router();
 
 router.get('/', new HomeController().hello);
 
-router.post('/login', new LoginController().login);
+// Auth
+router.post('/login', new AuthController().login);
+
+router.use('/user', (req, res, next) => {
+  console.log(req);
+  res.send('uai');
+});
 
 export default router;
