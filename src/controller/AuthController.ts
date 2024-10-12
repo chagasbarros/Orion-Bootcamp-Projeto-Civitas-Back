@@ -157,7 +157,10 @@ export class AuthController {
   }
 
   async middleware(req: Request, res: Response, next) {
-    if (!req.headers.authorization.includes('Bearer')) {
+    if (
+      !req.headers.authorization ||
+      !req.headers.authorization.includes('Bearer')
+    ) {
       return RouteResponse.unauthorizedError(
         res,
         'Token de autenticação não informado'

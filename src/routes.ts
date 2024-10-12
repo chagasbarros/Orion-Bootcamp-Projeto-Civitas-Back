@@ -9,9 +9,6 @@ router.get('/', new HomeController().hello);
 // Auth
 router.post('/login', new AuthController().login);
 
-router.use('/user', (req, res, next) => {
-  console.log(req);
-  res.send('uai');
-});
+router.use('/user', new AuthController().middleware);
 
 export default router;

@@ -24,10 +24,10 @@ export class RouteResponse {
   }
 
   public static notFound(res: Response, message?: string) {
-    return res.status(500).json({ message: message || 'Entity not found' });
+    return res.status(404).json({ message: message || 'Entity not found' });
   }
 
   public static unauthorizedError(res: Response, message?: string) {
-    return res.status(500).json({ message: message || 'Unauthorized Access' });
+    return res.status(401).json({ message: message || 'Unauthorized Access' });
   }
 }
