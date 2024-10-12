@@ -1,0 +1,69 @@
+name: CI/CD Pipeline
+
+on: 
+  pull_request:
+    branches:
+    - develop
+
+jobs:
+  build: 
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with: 
+        node-version: '16'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Lint code
+      run: npm run lint
+
+    - name: Run test
+      run: npm test
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up SSH for EC2
+      uses: webfactory/ssh-agent@v.0.7.0
+      with:
+        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+    - name: Deploy to EC2
+      run: |
+         ssh -o StrictHostKeyChecking=no deployuser@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+          cd /deployuser/Orion-Bootcamp-Projeto-Civitas-Back
+          git pull origin develop
+          cd /Orion-Bootcamp-Projeto-Civitas-Back
+          npm install
+          docker-compose up --build
+         EOF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
