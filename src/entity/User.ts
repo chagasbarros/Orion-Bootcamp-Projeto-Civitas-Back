@@ -26,20 +26,20 @@ export class User {
   @Column()
   createdAt: Date;
 
+  @Column()
+  updateAt: Date;
+
+  @ManyToMany(() => Role, (role) => role.users)
+  roles: Role[];
+
+  //Methods
   @BeforeInsert()
   public setCreatedAt(): void {
     this.createdAt = new Date();
   }
-
-  @Column()
-  updateAt: Date;
-
   @BeforeInsert()
   @BeforeUpdate()
   public setUpdateAt(): void {
     this.updateAt = new Date();
   }
-
-  @ManyToMany(() => Role, (role) => role.users)
-  roles: Role[];
 }
