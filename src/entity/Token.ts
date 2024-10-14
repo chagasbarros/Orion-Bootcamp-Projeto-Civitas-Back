@@ -25,7 +25,6 @@ export class Token {
   @ManyToOne(() => User, (user) => user.id)
   userId: number;
 
-  // Alterar para AuthName quando o merge for criado
-  @ManyToOne(() => Role, (role) => role.id)
+  @ManyToOne(() => Role)
   role: Role;
 }

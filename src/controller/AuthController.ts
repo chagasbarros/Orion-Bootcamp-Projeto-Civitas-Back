@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { RouteResponse } from '../helpers/RouteResponse';
-import { User } from '../entity/User';
 import { TokenRepository } from '../repositories/TokenRepository';
 import { UserRepository } from '../repositories/UserRepository';
 import { enumRoles } from '../models/enums/EnumRoles';
@@ -96,7 +95,7 @@ export class AuthController {
     if (
       !role ||
       !Object.values(enumRoles).includes(role) ||
-      !existingUser.roles.includes(role)
+      !existingUser.roles.includes(enumRoles[role as keyof enumRoles])
     ) {
       return RouteResponse.error(response, 'Permissão incorreta');
     }
@@ -131,7 +130,12 @@ export class AuthController {
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload;
     const expiresAt = new Date(decoded.exp * 1000);
 
-    tokenRepository.saveToken(token, expiresAt, existingUser.id);
+    tokenRepository.saveToken(
+      token,
+      enumRoles[role as keyof enumRoles],
+      expiresAt,
+      existingUser.id
+    );
 
     return RouteResponse.sucess(response, token);
   }

@@ -5,10 +5,12 @@ import {
   ManyToMany,
   JoinTable,
   BeforeInsert,
-  BeforeUpdate
+  BeforeUpdate,
+  OneToMany
 } from 'typeorm';
 import { User } from './User';
 import { enumRoles } from '../models/enums/EnumRoles';
+import { Token } from './Token';
 
 @Entity('roles')
 export class Role {
@@ -34,6 +36,9 @@ export class Role {
   @ManyToMany(() => User)
   @JoinTable({ name: 'roles_users' })
   users: User[];
+
+  @OneToMany(() => Token, (token) => token.role)
+  tokens: Token[];
 
   // Methods
   @BeforeInsert()

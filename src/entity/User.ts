@@ -4,10 +4,12 @@ import {
   Column,
   BeforeInsert,
   BeforeUpdate,
-  ManyToMany
+  ManyToMany,
+  OneToMany
 } from 'typeorm';
 
 import { Role } from './Role';
+import { Token } from './Token';
 
 @Entity('users')
 export class User {
@@ -31,6 +33,9 @@ export class User {
 
   @ManyToMany(() => Role, (role) => role.users)
   roles: Role[];
+
+  @OneToMany(() => Token, (token) => token.userId)
+  tokens: Token[];
 
   //Methods
   @BeforeInsert()

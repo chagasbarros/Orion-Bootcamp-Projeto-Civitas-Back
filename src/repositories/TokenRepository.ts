@@ -1,6 +1,7 @@
 import { Repository } from 'typeorm';
 import { MysqlDataSource } from '../config/database';
 import { Token } from '../entity/Token';
+import { Role } from '../entity/Role';
 
 export class TokenRepository extends Repository<Token> {
   constructor() {
@@ -15,10 +16,16 @@ export class TokenRepository extends Repository<Token> {
    */
   async saveToken(
     token: string,
+    role: Role,
     expiresAt: Date,
     userId: number
   ): Promise<void> {
-    await this.save({ token: token, expiresAt: expiresAt, userId: userId });
+    await this.save({
+      token: token,
+      role: role,
+      expiresAt: expiresAt,
+      userId: userId
+    });
   }
 
   /**
@@ -29,9 +36,11 @@ export class TokenRepository extends Repository<Token> {
    */
   async findTokenByUserIdAndRole(
     userId: number,
-    role: string
+    roleStr: string
   ): Promise<Token | undefined> {
-    return this.findOne({ where: { userId } });
+    return this.findOne({
+      where: { userId: userId, role: { authType: roleStr } }
+    });
   }
 
   /**
