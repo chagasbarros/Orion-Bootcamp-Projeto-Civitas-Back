@@ -59,11 +59,11 @@ export class AuthController {
    *             schema:
    *               type: object
    *               properties:
-   *                  content:
+   *                 status:
    *                   type: string
    *                   description: Status da requisição
-   *                   example: "Sucess"
-   *                 content:
+   *                   example: "Success"
+   *                 token:
    *                   type: string
    *                   description: Token JWT de autenticação
    *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
