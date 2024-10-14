@@ -3,26 +3,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { RouteResponse } from '../helpers/RouteResponse';
 import { User } from '../entity/User';
-import { TokenRepository } from '../repositories/TokenRepositorie';
-import { enumRoles } from '../entity/Role';
-
-const users: User[] = [
-  {
-    name: 'Murilo',
-    password: 'senha',
-    email: 'email',
-    createdAt: undefined,
-    setCreatedAt: function (): void {
-      throw new Error('Function not implemented.');
-    },
-    updateAt: undefined,
-    setUpdateAt: function (): void {
-      throw new Error('Function not implemented.');
-    },
-    roles: [],
-    id: 0
-  }
-];
+import { TokenRepository } from '../repositories/TokenRepository';
+import { UserRepository } from '../repositories/UserRepository';
+import { enumRoles } from '../models/enums/EnumRoles';
 
 export class AuthController {
   /**
@@ -51,6 +34,9 @@ export class AuthController {
    *             password:
    *               type: string
    *               example: "senha123"
+   *             role:
+   *               type: string
+   *               example: "ADMIN"
    *     responses:
    *       '200':
    *         description: Requisição executada com sucesso
@@ -67,8 +53,8 @@ export class AuthController {
    *                   type: string
    *                   description: Token JWT de autenticação
    *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-   *       '400':
-   *         description: Dados incorretos
+   *       '500':
+   *         description: Dados incorretos ou permissão negada
    *         content:
    *           application/json:
    *             schema:
@@ -76,12 +62,12 @@ export class AuthController {
    *               properties:
    *                 statusCode:
    *                   type: number
-   *                   example: 400
+   *                   example: 500
    *                 message:
    *                   type: string
    *                   example: "Nome de usuário ou senha incorretos"
    *       '404':
-   *         description: Usuário não encontrado
+   *         description: Dados do usuário incorretos
    *         content:
    *           application/json:
    *             schema:
@@ -95,11 +81,11 @@ export class AuthController {
    *                   example: "Nome de usuário ou senha incorretos"
    */
   async login(request: Request, response: Response) {
-    const { username, password, role } = request.body;
+    const { user, password, role } = request.body;
     const tokenRepository = new TokenRepository();
+    const userRepository = new UserRepository();
 
-    // TODO: Buscar no banco de dados a existencia do usuario ao inves de array user
-    const existingUser = users.find((user) => user.name === username);
+    const existingUser = await userRepository.findUserByEmail(user);
 
     if (!existingUser)
       return RouteResponse.notFound(
@@ -107,15 +93,15 @@ export class AuthController {
         'Nome de usuário ou senha incorretos'
       );
 
-    if (!role || !Object.values(enumRoles).includes(role)) {
+    if (
+      !role ||
+      !Object.values(enumRoles).includes(role) ||
+      !existingUser.roles.includes(role)
+    ) {
       return RouteResponse.error(response, 'Permissão incorreta');
     }
 
-    // TODO: conferir se o usuário tem nivel de permissão pedido
-
-    const Userpassword = await bcrypt.hash(existingUser.password, 10);
-
-    const validPassword = await bcrypt.compare(password, Userpassword);
+    const validPassword = await bcrypt.compare(password, existingUser.password);
     if (!validPassword)
       return RouteResponse.error(
         response,
@@ -126,8 +112,6 @@ export class AuthController {
       existingUser.id,
       role
     );
-
-    console.log(existingToken);
 
     if (existingToken) {
       jwt.verify(
@@ -140,13 +124,9 @@ export class AuthController {
       );
     }
 
-    const token = jwt.sign(
-      { username: username, role: role },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: '24h'
-      }
-    );
+    const token = jwt.sign({ user: user, role: role }, process.env.JWT_SECRET, {
+      expiresIn: '24h'
+    });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload;
     const expiresAt = new Date(decoded.exp * 1000);

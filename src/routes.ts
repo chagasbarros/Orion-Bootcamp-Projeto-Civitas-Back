@@ -9,6 +9,7 @@ router.get('/', new HomeController().hello);
 // Auth
 router.post('/login', new AuthController().login);
 
-router.use('/user', new AuthController().middleware);
+// Middleware
+router.use('/protected', new AuthController().middleware);
 
 export default router;
