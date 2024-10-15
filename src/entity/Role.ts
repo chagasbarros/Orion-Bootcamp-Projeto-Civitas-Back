@@ -20,18 +20,18 @@ export class Role {
     type: 'enum',
     enum: enumRoles
   })
-  public authType: string;
+  public authType: enumRoles;
 
   @Column()
   description: string;
 
-  @Column()
+  @Column({ default: () => 'NOW()' })
   createdAt: Date;
 
-  @Column()
+  @Column({ default: () => 'NOW()' })
   updatedAt: Date;
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, (user) => user.roles)
   @JoinTable({ name: 'roles_users' })
   users: User[];
 

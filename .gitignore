@@ -4,3 +4,4 @@
 
 # Files
 package-lock.json
+.env

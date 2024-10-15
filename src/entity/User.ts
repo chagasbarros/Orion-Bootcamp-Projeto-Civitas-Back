@@ -23,10 +23,10 @@ export class User {
   @Column()
   password: string;
 
-  @Column()
+  @Column({ default: () => 'NOW()' })
   createdAt: Date;
 
-  @Column()
+  @Column({ default: () => 'NOW()' })
   updateAt: Date;
 
   @ManyToMany(() => Role, (role) => role.users)
@@ -34,12 +34,13 @@ export class User {
 
   //Methods
   @BeforeInsert()
-  public setCreatedAt(): void {
+  setCreatedAt() {
+    console.log('Setting createdAt');
     this.createdAt = new Date();
   }
   @BeforeInsert()
   @BeforeUpdate()
-  public setUpdateAt(): void {
+  setUpdateAt() {
     this.updateAt = new Date();
   }
 }
