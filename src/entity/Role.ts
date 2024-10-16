@@ -10,7 +10,7 @@ import {
 import { User } from './User';
 import { enumRoles } from '../models/enums/EnumRoles';
 
-@Entity('roles')
+@Entity('role')
 export class Role {
   @PrimaryGeneratedColumn()
   id: number;
@@ -25,14 +25,14 @@ export class Role {
   @Column()
   description: string;
 
-  @Column()
+  @Column({ default: () => 'NOW()' })
   createdAt: Date;
 
-  @Column()
+  @Column({ default: () => 'NOW()' })
   updatedAt: Date;
 
   @ManyToMany(() => User)
-  @JoinTable({ name: 'roles_users' })
+  @JoinTable({ name: 'role_user' })
   users: User[];
 
   // Methods

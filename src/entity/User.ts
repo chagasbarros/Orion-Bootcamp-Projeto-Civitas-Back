@@ -4,12 +4,14 @@ import {
   Column,
   BeforeInsert,
   BeforeUpdate,
-  ManyToMany
+  ManyToMany,
+  OneToMany
 } from 'typeorm';
 
 import { Role } from './Role';
+import { Token } from './Token';
 
-@Entity('users')
+@Entity('user')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -23,14 +25,17 @@ export class User {
   @Column()
   password: string;
 
-  @Column()
+  @Column({ default: () => 'NOW()' })
   createdAt: Date;
 
-  @Column()
+  @Column({ default: () => 'NOW()' })
   updateAt: Date;
 
   @ManyToMany(() => Role, (role) => role.users)
   roles: Role[];
+
+  @OneToMany(() => Token, (token) => token.userId)
+  tokens: Token[];
 
   //Methods
   @BeforeInsert()
