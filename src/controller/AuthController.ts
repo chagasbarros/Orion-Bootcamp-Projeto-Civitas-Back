@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 import { RouteResponse } from '../helpers/RouteResponse';
 import { TokenRepository } from '../repositories/TokenRepository';
 import { UserRepository } from '../repositories/UserRepository';
-import { enumRoles } from '../models/enums/EnumRoles';
 
 export class AuthController {
   /**
@@ -24,18 +23,15 @@ export class AuthController {
    *         schema:
    *           type: object
    *           required:
-   *             - username
+   *             - email
    *             - password
    *           properties:
-   *             username:
+   *             email:
    *               type: string
-   *               example: "usuario123"
+   *               example: "usuario@email.com"
    *             password:
    *               type: string
    *               example: "senha123"
-   *             role:
-   *               type: string
-   *               example: "ADMIN"
    *     responses:
    *       '200':
    *         description: Requisição executada com sucesso
@@ -53,7 +49,7 @@ export class AuthController {
    *                   description: Token JWT de autenticação
    *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
    *       '500':
-   *         description: Dados incorretos ou permissão negada
+   *         description: Dados incorretos
    *         content:
    *           application/json:
    *             schema:
@@ -80,81 +76,36 @@ export class AuthController {
    *                   example: "Nome de usuário ou senha incorretos"
    */
   async login(request: Request, response: Response) {
-    const { user, password, role } = request.body;
+    const { email, password } = request.body;
     const tokenRepository = new TokenRepository();
     const userRepository = new UserRepository();
 
-    const existingUser = await userRepository.findUserByEmail(user);
+    const existingUser = await userRepository.findUserByEmail(email);
 
-    if (!existingUser)
+    if (!existingUser) {
       return RouteResponse.notFound(
         response,
         'Nome de usuário ou senha incorretos'
       );
-
-    if (
-      !role ||
-      !Object.values(enumRoles).includes(role) ||
-      !existingUser.roles.includes(enumRoles[role as keyof enumRoles])
-    ) {
-      return RouteResponse.error(response, 'Permissão incorreta');
     }
 
     const validPassword = await bcrypt.compare(password, existingUser.password);
-    if (!validPassword)
+    if (!validPassword) {
       return RouteResponse.error(
         response,
         'Nome de usuário ou senha incorretos'
       );
-
-    const existingToken = await tokenRepository.findTokenByUserIdAndRole(
-      existingUser.id,
-      role
-    );
-
-    if (existingToken) {
-      jwt.verify(
-        existingToken.token,
-        process.env.JWT_SECRET,
-        function (err, decoded) {
-          if (!err) return RouteResponse.sucess(response, decoded);
-          else tokenRepository.remove(existingToken);
-        }
-      );
     }
 
-    const token = jwt.sign({ user: user, role: role }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ email: email }, process.env.JWT_SECRET, {
       expiresIn: '24h'
     });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload;
     const expiresAt = new Date(decoded.exp * 1000);
 
-    tokenRepository.saveToken(
-      token,
-      enumRoles[role as keyof enumRoles],
-      expiresAt,
-      existingUser.id
-    );
+    tokenRepository.save({ token, expiresAt, existingUser });
 
     return RouteResponse.sucess(response, token);
-  }
-
-  async middleware(req: Request, res: Response, next) {
-    if (
-      !req.headers.authorization ||
-      !req.headers.authorization.includes('Bearer')
-    ) {
-      return RouteResponse.unauthorizedError(
-        res,
-        'Token de autenticação não informado'
-      );
-    } else {
-      const token = req.headers.authorization.replace('Bearer ', '');
-      jwt.verify(token, process.env.JWT_SECRET, function (err) {
-        if (err) RouteResponse.unauthorizedError(res, err.message);
-        else next();
-      });
-    }
   }
 }
