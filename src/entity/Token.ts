@@ -6,9 +6,8 @@ import {
   PrimaryGeneratedColumn
 } from 'typeorm';
 import { User } from './User';
-import { Role } from './Role';
 
-@Entity('Token')
+@Entity('token')
 export class Token {
   @PrimaryGeneratedColumn()
   id: number;
@@ -24,7 +23,4 @@ export class Token {
 
   @ManyToOne(() => User, (user) => user.id)
   userId: number;
-
-  @ManyToOne(() => Role)
-  role: Role;
 }
