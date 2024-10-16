@@ -49,7 +49,7 @@ export class AuthController {
    *                   description: Token JWT de autenticação
    *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
    *       '500':
-   *         description: Dados incorretos
+   *         description: Dados incorretos ou ausentes
    *         content:
    *           application/json:
    *             schema:
@@ -79,6 +79,13 @@ export class AuthController {
     const { email, password } = request.body;
     const tokenRepository = new TokenRepository();
     const userRepository = new UserRepository();
+
+    if (!email || !password) {
+      return RouteResponse.error(
+        response,
+        'email ou senha do usuário ausentes'
+      );
+    }
 
     const existingUser = await userRepository.findUserByEmail(email);
 
