@@ -25,10 +25,10 @@ export class User {
   @Column()
   password: string;
 
-  @Column()
+  @Column({ default: () => 'NOW()' })
   createdAt: Date;
 
-  @Column()
+  @Column({ default: () => 'NOW()' })
   updateAt: Date;
 
   @ManyToMany(() => Role, (role) => role.users)
