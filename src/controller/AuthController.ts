@@ -16,22 +16,21 @@ export class AuthController {
    *       - application/json
    *     produces:
    *       - application/json
-   *     parameters:
-   *       - in: body
-   *         name: Login
-   *         description: Credenciais do usuário para login
-   *         schema:
-   *           type: object
-   *           required:
-   *             - email
-   *             - password
-   *           properties:
-   *             email:
-   *               type: string
-   *               example: "usuario@email.com"
-   *             password:
-   *               type: string
-   *               example: "senha123"
+   *     requestBody:
+   *       content:
+   *        application/json:
+   *          schema:
+   *            type: object
+   *            required:
+   *              - email
+   *              - password
+   *            properties:
+   *              email:
+   *                type: string
+   *                example: "usuario@email.com"
+   *              password:
+   *                type: string
+   *                example: "senha"
    *     responses:
    *       '200':
    *         description: Requisição executada com sucesso
